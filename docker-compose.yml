@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: slinc
+      POSTGRES_PASSWORD: slinc
+      POSTGRES_DB: slinc_records
+    ports:
+      - "5432:5432"
+    volumes:
+      - slinc_pg:/var/lib/postgresql/data
+
+volumes:
+  slinc_pg:

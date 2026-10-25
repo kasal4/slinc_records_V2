@@ -1,0 +1,218 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum CassetteCondition {
+  NEW
+  LIKE_NEW
+  VERY_GOOD
+  GOOD
+  FAIR
+}
+
+enum OrderStatus {
+  PENDING
+  AWAITING_PAYMENT
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  WITHDRAWN
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  COD
+}
+
+enum ConsentType {
+  TERMS
+  PRIVACY_NOTICE
+  MARKETING
+  COOKIES_ANALYTICS
+  COOKIES_MARKETING
+}
+
+enum DataRequestType {
+  EXPORT
+  ERASURE
+  RECTIFICATION
+}
+
+enum DataRequestStatus {
+  RECEIVED
+  COMPLETED
+  REJECTED
+}
+
+enum WithdrawalStatus {
+  DRAFT
+  CONFIRMED
+  RECEIVED_GOODS
+  REFUNDED
+  REJECTED
+}
+
+model User {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  passwordHash       String
+  name               String
+  phone              String?
+  role               Role      @default(CUSTOMER)
+  marketingConsent   Boolean   @default(false)
+  marketingConsentAt DateTime?
+  anonymizedAt       DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  orders       Order[]
+  consents     ConsentEvent[]
+  dataRequests DataRequest[]
+  auditLogs    AuditLog[]     @relation("Actor")
+}
+
+model Product {
+  id          String             @id @default(cuid())
+  slug        String             @unique
+  sku         String             @unique
+  title       String
+  artist      String
+  year        Int?
+  label       String?
+  condition   CassetteCondition
+  description String
+  priceHalere Int
+  vatRateBps  Int                @default(2100)
+  stock       Int                @default(0)
+  published   Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  items       OrderItem[]
+}
+
+model Order {
+  id                      String        @id @default(cuid())
+  number                  String        @unique
+  accessToken             String        @unique
+  userId                  String?
+  user                    User?         @relation(fields: [userId], references: [id])
+  email                   String
+  status                  OrderStatus   @default(AWAITING_PAYMENT)
+  paymentMethod           PaymentMethod
+  billingName             String
+  billingStreet           String
+  billingCity             String
+  billingZip              String
+  billingCountry          String        @default("CZ")
+  shippingName            String
+  shippingStreet          String
+  shippingCity            String
+  shippingZip             String
+  shippingCountry         String        @default("CZ")
+  phone                   String
+  note                    String?
+  subtotalHalere          Int
+  shippingHalere          Int
+  vatHalere               Int
+  totalHalere             Int
+  termsVersion            String
+  privacyVersion          String
+  termsAcceptedAt         DateTime
+  withdrawalInfoAt        DateTime
+  consumerContract        Boolean       @default(true)
+  retentionUntil          DateTime
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+  items                   OrderItem[]
+  withdrawal              Withdrawal?
+}
+
+model OrderItem {
+  id            String  @id @default(cuid())
+  orderId       String
+  order         Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId     String?
+  product       Product? @relation(fields: [productId], references: [id])
+  title         String
+  artist        String
+  sku           String
+  quantity      Int
+  unitHalere    Int
+  vatRateBps    Int
+}
+
+model ConsentEvent {
+  id        String      @id @default(cuid())
+  userId    String?
+  user      User?       @relation(fields: [userId], references: [id])
+  email     String?
+  type      ConsentType
+  granted   Boolean
+  source    String
+  version   String
+  createdAt DateTime    @default(now())
+}
+
+model CookiePreference {
+  id         String   @id @default(cuid())
+  visitorId  String   @unique
+  analytics  Boolean  @default(false)
+  marketing  Boolean  @default(false)
+  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now())
+}
+
+model DataRequest {
+  id          String             @id @default(cuid())
+  userId      String
+  user        User               @relation(fields: [userId], references: [id])
+  type        DataRequestType
+  status      DataRequestStatus  @default(RECEIVED)
+  note        String?
+  payload     Json?
+  createdAt   DateTime           @default(now())
+  completedAt DateTime?
+}
+
+model Withdrawal {
+  id           String            @id @default(cuid())
+  orderId      String            @unique
+  order        Order             @relation(fields: [orderId], references: [id])
+  status       WithdrawalStatus  @default(DRAFT)
+  reason       String?
+  requestedAt  DateTime          @default(now())
+  confirmedAt  DateTime?
+  deadlineAt   DateTime
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String?
+  actor       User?    @relation("Actor", fields: [actorUserId], references: [id])
+  action      String
+  entity      String
+  entityId    String
+  createdAt   DateTime @default(now())
+}
+
+model LegalDocument {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  version   String
+  title     String
+  body      String
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
