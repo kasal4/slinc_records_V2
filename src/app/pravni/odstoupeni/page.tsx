@@ -1,27 +1,22 @@
+import { t } from "@/lib/i18n";
+import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata = { title: "Informace o odstoupení" };
+export function generateMetadata(): Metadata {
+  return { title: t().withdrawalInfo.title };
+}
 
 export default function WithdrawalInfoPage() {
+  const copy = t();
   return (
     <article className="legal">
-      <h1>Informace o právu odstoupit od smlouvy</h1>
-      <p>
-        Jste-li spotřebitel, můžete od smlouvy uzavřené na dálku odstoupit do 14
-        dnů od převzetí posledního kusu zboží, bez uvedení důvodu.
-      </p>
-      <p>
-        Odstoupení zašlete e-mailem nebo přes tlačítko. Po odstoupení zboží zašlete
-        bez zbytečného odkladu, nejpozději do 14 dnů.
-      </p>
-      <p>
-        Přímé náklady na vrácení zboží nesete vy, pokud nebylo dohodnuto jinak.
-        Výjimky (například zboží zhotovené na přání) se u běžných kazet z katalogu
-        zpravidla neuplatní.
-      </p>
+      <h1>{copy.withdrawalInfo.title}</h1>
+      <p>{copy.withdrawalInfo.p1}</p>
+      <p>{copy.withdrawalInfo.p2}</p>
+      <p>{copy.withdrawalInfo.p3}</p>
       <p>
         <Link className="button" href="/odstoupeni">
-          Odstoupit od smlouvy
+          {copy.withdrawalInfo.button}
         </Link>
       </p>
     </article>

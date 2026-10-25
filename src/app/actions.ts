@@ -3,6 +3,8 @@
 import { auth } from "@/lib/session";
 import { audit } from "@/lib/audit";
 import { readCart, writeCart } from "@/lib/cart";
+import { isProductFormat } from "@/lib/product-format";
+import { LOCALE_COOKIE, isLocale, type Locale } from "@/lib/i18n";
 import {
   ACCOUNTING_RETENTION_YEARS,
   COD_SURCHARGE_HALERE,
@@ -436,14 +438,16 @@ export async function createProduct(formData: FormData) {
   const slug = String(formData.get("slug") ?? "")
     .toLowerCase()
     .replace(/[^a-z0-9-]+/g, "-");
+  const formatValue = String(formData.get("format") ?? "mc");
   await prisma.product.create({
     data: {
       title,
       artist,
       slug,
-      sku: String(formData.get("sku")),
+      sku: slug,
+      format: isProductFormat(formatValue) ? formatValue : "mc",
       year: Number(formData.get("year")) || null,
-      label: String(formData.get("label") ?? "Slinč Records"),
+      label: String(formData.get("label") ?? "Šlinc Records"),
       condition: "NEW",
       description: String(formData.get("description") ?? ""),
       priceHalere: Math.round(Number(formData.get("priceCzk")) * 100),
@@ -452,4 +456,15 @@ export async function createProduct(formData: FormData) {
   });
   revalidatePath("/admin");
   revalidatePath("/katalog");
+}
+
+export async function setLocale(locale: Locale) {
+  if (!isLocale(locale)) return;
+  cookies().set(LOCALE_COOKIE, locale, {
+    httpOnly: false,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
+  });
+  revalidatePath("/", "layout");
 }

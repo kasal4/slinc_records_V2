@@ -1,47 +1,37 @@
+import { t } from "@/lib/i18n";
 import { merchant } from "@/lib/merchant";
+import type { Metadata } from "next";
 
-export const metadata = { title: "Osobní údaje" };
+export function generateMetadata(): Metadata {
+  return { title: t().privacy.title };
+}
 
 export default function PrivacyPage() {
   const shop = merchant();
+  const copy = t();
   return (
     <article className="legal">
-      <h1>Zásady zpracování osobních údajů</h1>
+      <h1>{copy.privacy.title}</h1>
+      <p>{copy.privacy.intro}</p>
+      <h2>{copy.privacy.controller}</h2>
       <p>
-        Informace podle čl. 13 a 14 GDPR. Toto je provozní šablona, ne právní
-        posudek.
+        {shop.legalName} ({shop.name}), {shop.street}, {shop.zip} {shop.city}, {shop.email}.
       </p>
-      <h2>Správce</h2>
-      <p>
-        {shop.name}, {shop.street}, {shop.zip} {shop.city}, {shop.email}.
-      </p>
-      <h2>Účely a základy</h2>
+      <h2>{copy.privacy.purposes}</h2>
       <ul>
-        <li>plnění smlouvy a účetnictví (čl. 6 odst. 1 písm. b a c GDPR)</li>
-        <li>provoz účtu a košíku (smlouva / oprávněný zájem)</li>
-        <li>marketing jen se souhlasem (čl. 6 odst. 1 písm. a)</li>
-        <li>analytické a marketingové cookies jen se souhlasem</li>
+        <li>{copy.privacy.purposeContract}</li>
+        <li>{copy.privacy.purposeAccount}</li>
+        <li>{copy.privacy.purposeMarketing}</li>
+        <li>{copy.privacy.purposeCookies}</li>
       </ul>
-      <h2>Jaké údaje</h2>
-      <p>
-        Jméno, e-mail, telefon, adresa, obsah objednávky, souhlasy, stav skladu
-        objednávek. Čísla karet se neukládají.
-      </p>
-      <h2>Příjemci</h2>
-      <p>
-        Dopravce, účetní, případně platební brána a hosting. S každým musí být
-        smlouva o zpracování.
-      </p>
-      <h2>Lhůty</h2>
-      <p>
-        Účet do výmazu. Marketing do odvolání souhlasu. Objednávky 10 let kvůli
-        daňové evidenci, potom anonymizace.
-      </p>
-      <h2>Práva</h2>
-      <p>
-        Přístup, oprava, omezení, námitka, přenositelnost, odvolání souhlasu a
-        stížnost u ÚOOÚ. Export a anonymizace účtu jsou v sekci Účet.
-      </p>
+      <h2>{copy.privacy.data}</h2>
+      <p>{copy.privacy.dataText}</p>
+      <h2>{copy.privacy.recipients}</h2>
+      <p>{copy.privacy.recipientsText}</p>
+      <h2>{copy.privacy.retention}</h2>
+      <p>{copy.privacy.retentionText}</p>
+      <h2>{copy.privacy.rights}</h2>
+      <p>{copy.privacy.rightsText}</p>
     </article>
   );
 }

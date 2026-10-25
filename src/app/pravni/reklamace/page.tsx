@@ -1,20 +1,19 @@
+import { interpolate, t } from "@/lib/i18n";
 import { merchant } from "@/lib/merchant";
+import type { Metadata } from "next";
 
-export const metadata = { title: "Reklamační řád" };
+export function generateMetadata(): Metadata {
+  return { title: t().claims.title };
+}
 
 export default function ClaimsPage() {
   const shop = merchant();
+  const copy = t();
   return (
     <article className="legal">
-      <h1>Reklamační řád</h1>
-      <p>
-        Práva z vadného plnění se uplatňují na {shop.email}. U použité kazety je
-        rozhodný stav popsaný u zboží. Zákonná práva spotřebitele nelze vyloučit.
-      </p>
-      <p>
-        Reklamaci vyřídíme bez zbytečného odkladu, nejpozději ve lhůtě podle
-        zákona. Zboží zašlete na adresu sídla s číslem objednávky.
-      </p>
+      <h1>{copy.claims.title}</h1>
+      <p>{interpolate(copy.claims.lead, { email: shop.email })}</p>
+      <p>{copy.claims.process}</p>
     </article>
   );
 }

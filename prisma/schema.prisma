@@ -91,8 +91,10 @@ model Product {
   artist      String
   year        Int?
   label       String?
+  format      String
   condition   CassetteCondition
   description String
+  image       String?
   priceHalere Int
   vatRateBps  Int                @default(2100)
   stock       Int                @default(0)

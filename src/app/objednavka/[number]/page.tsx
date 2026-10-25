@@ -1,6 +1,7 @@
+import { getLocale, interpolate, t } from "@/lib/i18n";
 import { formatCzk } from "@/lib/merchant";
-import { auth } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/session";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -11,6 +12,8 @@ export default async function OrderDonePage({
   params: { number: string };
   searchParams: { t?: string };
 }) {
+  const locale = getLocale();
+  const copy = t();
   const session = await auth();
   const order = await prisma.order.findUnique({
     where: { number: params.number },
@@ -25,25 +28,24 @@ export default async function OrderDonePage({
 
   return (
     <section className="hero">
-      <div className="flash">Objednávka {order.number} je přijatá.</div>
-      <h1>Děkujeme</h1>
+      <div className="flash">
+        {interpolate(copy.orderDone.accepted, { number: order.number })}
+      </div>
+      <h1>{copy.orderDone.thanks}</h1>
       <p>
-        Celkem {formatCzk(order.totalHalere)}. Platba:{" "}
-        {order.paymentMethod === "COD" ? "dobírka" : "převod na účet"}.
+        {copy.orderDone.total} {formatCzk(order.totalHalere, locale)}. {copy.orderDone.payment}:{" "}
+        {order.paymentMethod === "COD" ? copy.orderDone.cod : copy.orderDone.bank}.
       </p>
       <ul>
         {order.items.map((item) => (
           <li key={item.id}>
-            {item.artist} — {item.title} ({item.quantity} ks)
+            {item.artist} — {item.title} ({item.quantity} {copy.orderDone.pieces})
           </li>
         ))}
       </ul>
-      <p>
-        Od smlouvy můžete odstoupit do 14 dnů. K potvrzení budete potřebovat číslo
-        objednávky a e-mail.
-      </p>
+      <p>{copy.orderDone.withdrawHint}</p>
       <Link className="button" href={`/odstoupeni?objednavka=${order.number}`}>
-        Odstoupit od smlouvy
+        {copy.orderDone.withdraw}
       </Link>
     </section>
   );

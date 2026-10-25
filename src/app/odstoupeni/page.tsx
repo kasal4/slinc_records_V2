@@ -1,22 +1,24 @@
 import { confirmWithdrawal } from "@/app/actions";
+import { t } from "@/lib/i18n";
+import type { Metadata } from "next";
 
-export const metadata = { title: "Odstoupení od smlouvy" };
+export function generateMetadata(): Metadata {
+  return { title: t().withdrawal.title };
+}
 
 export default function WithdrawalPage({
   searchParams,
 }: {
   searchParams: { objednavka?: string };
 }) {
+  const copy = t();
   return (
     <section className="hero">
-      <h1>Odstoupit od smlouvy</h1>
-      <p>
-        U spotřebitelské smlouvy uzavřené na dálku můžete odstoupit do 14 dnů od
-        převzetí zboží. Odesláním druhého kroku se odstoupení stává závazným.
-      </p>
+      <h1>{copy.withdrawal.title}</h1>
+      <p>{copy.withdrawal.lead}</p>
       <form action={confirmWithdrawal} className="panel">
         <label>
-          Číslo objednávky
+          {copy.withdrawal.orderNumber}
           <input
             name="orderNumber"
             required
@@ -24,18 +26,18 @@ export default function WithdrawalPage({
           />
         </label>
         <label>
-          E-mail z objednávky
+          {copy.withdrawal.email}
           <input name="email" type="email" required />
         </label>
         <label>
-          Důvod (nepovinné)
+          {copy.withdrawal.reason}
           <textarea name="reason" rows={3} />
         </label>
         <label className="check">
           <input type="checkbox" name="confirm" required />
-          Potvrzuji odstoupení od smlouvy
+          {copy.withdrawal.confirm}
         </label>
-        <button type="submit">Potvrdit odstoupení od smlouvy</button>
+        <button type="submit">{copy.withdrawal.submit}</button>
       </form>
     </section>
   );

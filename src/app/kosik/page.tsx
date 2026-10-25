@@ -1,12 +1,19 @@
 import { setCartQuantity } from "@/app/actions";
 import { readCart } from "@/lib/cart";
+import { getLocale, t } from "@/lib/i18n";
 import { formatCzk, SHIPPING_HALERE } from "@/lib/merchant";
+import { formatName } from "@/lib/product-format";
 import { prisma } from "@/lib/prisma";
+import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata = { title: "Košík" };
+export function generateMetadata(): Metadata {
+  return { title: t().cart.title };
+}
 
 export default async function CartPage() {
+  const locale = getLocale();
+  const copy = t();
   const cart = readCart();
   const products = await prisma.product.findMany({
     where: { id: { in: cart.map((line) => line.productId) } },
@@ -25,30 +32,40 @@ export default async function CartPage() {
 
   return (
     <section className="hero">
-      <h1>Košík</h1>
+      <h1>{copy.cart.title}</h1>
       {rows.length === 0 ? (
-        <p>Košík je prázdný.</p>
+        <p>{copy.cart.empty}</p>
       ) : (
         <>
           {rows.map((row) => (
-            <article className="panel" key={row!.productId} style={{ marginBottom: 12 }}>
+            <article className="panel cart-line" key={row!.productId} style={{ marginBottom: 12 }}>
+              {row!.product.image ? (
+                <img src={row!.product.image} alt="" />
+              ) : null}
+              <div>
               <strong>
                 {row!.product.artist} — {row!.product.title}
               </strong>
+              <p className="muted">{formatName(row!.product.format, copy)}</p>
               <p>
-                {row!.quantity} × {formatCzk(row!.product.priceHalere)}
+                {row!.quantity} × {formatCzk(row!.product.priceHalere, locale)}
               </p>
               <form action={setCartQuantity.bind(null, row!.productId, 0)}>
                 <button className="secondary" type="submit">
-                  Odebrat
+                  {copy.cart.remove}
                 </button>
               </form>
+              </div>
             </article>
           ))}
-          <p>Zboží: {formatCzk(subtotal)}</p>
-          <p className="muted">Doprava se dopočítá v objednávce od {formatCzk(SHIPPING_HALERE)}.</p>
+          <p>
+            {copy.cart.goods}: {formatCzk(subtotal, locale)}
+          </p>
+          <p className="muted">
+            {copy.cart.shippingNote} {formatCzk(SHIPPING_HALERE, locale)}.
+          </p>
           <Link className="button" href="/objednavka">
-            K objednávce
+            {copy.cart.checkout}
           </Link>
         </>
       )}

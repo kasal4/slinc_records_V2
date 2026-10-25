@@ -1,13 +1,19 @@
 import { placeOrder } from "@/app/actions";
 import { readCart } from "@/lib/cart";
+import { getLocale, t } from "@/lib/i18n";
 import { COD_SURCHARGE_HALERE, formatCzk, SHIPPING_HALERE } from "@/lib/merchant";
-import { auth } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/session";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-export const metadata = { title: "Objednávka" };
+export function generateMetadata(): Metadata {
+  return { title: t().checkout.title };
+}
 
 export default async function CheckoutPage() {
+  const locale = getLocale();
+  const copy = t();
   const cart = readCart();
   if (cart.length === 0) redirect("/kosik");
   const session = await auth();
@@ -24,18 +30,19 @@ export default async function CheckoutPage() {
 
   return (
     <section className="hero">
-      <h1>Objednávka s povinností platby</h1>
+      <h1>{copy.checkout.title}</h1>
       <p>
-        Zboží {formatCzk(subtotal)}. Česká pošta / balík od {formatCzk(SHIPPING_HALERE)}.
-        Dobírka + {formatCzk(COD_SURCHARGE_HALERE)}.
+        {copy.checkout.goods} {formatCzk(subtotal, locale)}. {copy.checkout.shipping}{" "}
+        {formatCzk(SHIPPING_HALERE, locale)}. {copy.checkout.cod}{" "}
+        {formatCzk(COD_SURCHARGE_HALERE, locale)}.
       </p>
       <form action={placeOrder} className="panel">
         <label>
-          Jméno a příjmení
+          {copy.checkout.name}
           <input name="name" required defaultValue={user?.name ?? ""} />
         </label>
         <label>
-          E-mail
+          {copy.checkout.email}
           <input
             name="email"
             type="email"
@@ -44,46 +51,46 @@ export default async function CheckoutPage() {
           />
         </label>
         <label>
-          Telefon
+          {copy.checkout.phone}
           <input name="phone" required defaultValue={user?.phone ?? ""} />
         </label>
         <label>
-          Ulice a č. p.
+          {copy.checkout.street}
           <input name="street" required />
         </label>
         <label>
-          Město
+          {copy.checkout.city}
           <input name="city" required />
         </label>
         <label>
-          PSČ
+          {copy.checkout.zip}
           <input name="zip" required />
         </label>
         <label>
-          Platba
+          {copy.checkout.payment}
           <select name="paymentMethod" defaultValue="BANK_TRANSFER">
-            <option value="BANK_TRANSFER">Převod na účet (zatím bez platební brány)</option>
-            <option value="COD">Dobírka</option>
+            <option value="BANK_TRANSFER">{copy.checkout.bankTransfer}</option>
+            <option value="COD">{copy.checkout.cashOnDelivery}</option>
           </select>
         </label>
         <label>
-          Poznámka
+          {copy.checkout.note}
           <textarea name="note" rows={3} />
         </label>
         <label className="check">
           <input type="checkbox" name="terms" required />
-          Četl(a) jsem a souhlasím s{" "}
-          <a href="/pravni/obchodni-podminky">obchodními podmínkami</a>.
+          {copy.checkout.termsPrefix}{" "}
+          <a href="/pravni/obchodni-podminky">{copy.checkout.termsLink}</a>.
         </label>
         <label className="check">
           <input type="checkbox" name="withdrawalInfo" required />
-          Byl(a) jsem informován(a) o právu odstoupit od smlouvy do 14 dnů.
+          {copy.checkout.withdrawal}
         </label>
         <label className="check">
           <input type="checkbox" name="marketing" />
-          Chci občas e-mail o nových kazetách (volitelné, lze kdykoli odvolat).
+          {copy.checkout.marketing}
         </label>
-        <button type="submit">Odeslat objednávku s povinností platby</button>
+        <button type="submit">{copy.checkout.submit}</button>
       </form>
     </section>
   );

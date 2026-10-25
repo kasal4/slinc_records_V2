@@ -1,14 +1,20 @@
 import { eraseMyAccount, setMarketingConsent } from "@/app/actions";
 import { SignOutButton } from "@/components/SignOutButton";
+import { getLocale, t } from "@/lib/i18n";
 import { formatCzk } from "@/lib/merchant";
-import { auth } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/session";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-export const metadata = { title: "Účet" };
+export function generateMetadata(): Metadata {
+  return { title: t().account.title };
+}
 
 export default async function AccountPage() {
+  const locale = getLocale();
+  const copy = t();
   const session = await auth();
   if (!session?.user.id) redirect("/prihlaseni");
   const user = await prisma.user.findUnique({
@@ -21,44 +27,42 @@ export default async function AccountPage() {
     <section className="hero">
       <h1>{user.name}</h1>
       <p>{user.email}</p>
-      <SignOutButton />
-      <h2>Objednávky</h2>
+      <SignOutButton label={copy.account.signOut} />
+      <h2>{copy.account.orders}</h2>
       {user.orders.length === 0 ? (
-        <p>Zatím žádné.</p>
+        <p>{copy.account.noOrders}</p>
       ) : (
         <ul>
           {user.orders.map((order) => (
             <li key={order.id}>
-              {order.number} · {formatCzk(order.totalHalere)} · {order.status}
+              {order.number} · {formatCzk(order.totalHalere, locale)} · {order.status}
             </li>
           ))}
         </ul>
       )}
-      <h2>Osobní údaje</h2>
+      <h2>{copy.account.personal}</h2>
       <p>
-        Marketingové e-maily: {user.marketingConsent ? "zapnuté" : "vypnuté"}.
+        {copy.account.marketingLabel}:{" "}
+        {user.marketingConsent ? copy.account.marketingOn : copy.account.marketingOff}.
       </p>
       <form action={setMarketingConsent.bind(null, !user.marketingConsent)}>
         <button className="secondary" type="submit">
-          {user.marketingConsent ? "Odvolat marketing" : "Povolit marketing"}
+          {user.marketingConsent ? copy.account.revokeMarketing : copy.account.allowMarketing}
         </button>
       </form>
       <p>
         <a className="button secondary" href="/api/gdpr/export">
-          Stáhnout export údajů
+          {copy.account.export}
         </a>
       </p>
       <form action={eraseMyAccount}>
         <button className="secondary" type="submit">
-          Anonymizovat účet
+          {copy.account.erase}
         </button>
       </form>
-      <p className="muted">
-        Objednávky zůstanou v účetnictví do konce zákonné lhůty. Přihlašovací údaje
-        a marketing se smažou.
-      </p>
+      <p className="muted">{copy.account.eraseHint}</p>
       <p>
-        <Link href="/odstoupeni">Odstoupit od smlouvy</Link>
+        <Link href="/odstoupeni">{copy.account.withdraw}</Link>
       </p>
     </section>
   );

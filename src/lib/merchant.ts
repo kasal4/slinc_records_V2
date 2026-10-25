@@ -8,7 +8,8 @@ export const ACCOUNTING_RETENTION_YEARS = 10;
 
 export function merchant() {
   return {
-    name: process.env.MERCHANT_NAME ?? "Slinč Records",
+    name: process.env.MERCHANT_NAME ?? "Šlinc Records",
+    legalName: process.env.MERCHANT_LEGAL_NAME ?? "Jan Kasal",
     legalForm: process.env.MERCHANT_LEGAL_FORM ?? "OSVČ",
     ico: process.env.MERCHANT_ICO || "doplňte IČO",
     dic: process.env.MERCHANT_DIC || "není plátce DPH / doplňte DIČ",
@@ -24,20 +25,12 @@ export function merchant() {
   };
 }
 
-export function formatCzk(halere: number) {
-  return new Intl.NumberFormat("cs-CZ", {
+export function formatCzk(halere: number, locale: "cs" | "en" = "cs") {
+  return new Intl.NumberFormat(locale === "en" ? "en-GB" : "cs-CZ", {
     style: "currency",
     currency: "CZK",
   }).format(halere / 100);
 }
-
-export const CONDITION_LABEL: Record<string, string> = {
-  NEW: "nová",
-  LIKE_NEW: "jako nová",
-  VERY_GOOD: "velmi dobrá",
-  GOOD: "dobrá",
-  FAIR: "použitá se stopami",
-};
 
 export const SHIPPING_HALERE = 8900;
 export const COD_SURCHARGE_HALERE = 3900;

@@ -1,9 +1,10 @@
 "use client";
 
 import { saveCookiePreferences } from "@/app/actions";
+import type { Messages } from "@/lib/messages";
 import { useEffect, useState } from "react";
 
-export function CookieBanner() {
+export function CookieBanner({ copy }: { copy: Messages["cookieBanner"] }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -14,11 +15,8 @@ export function CookieBanner() {
 
   return (
     <div className="banner" role="dialog" aria-labelledby="cookie-title">
-      <h2 id="cookie-title">Cookies</h2>
-      <p>
-        Nezbytné cookies (košík, přihlášení, volba souhlasu) používáme vždy.
-        Analytiku a marketing zapneme jen po vašem souhlasu.
-      </p>
+      <h2 id="cookie-title">{copy.title}</h2>
+      <p>{copy.text}</p>
       <form
         action={async (data) => {
           await saveCookiePreferences(data);
@@ -27,14 +25,14 @@ export function CookieBanner() {
       >
         <label className="check">
           <input type="checkbox" name="analytics" />
-          Analytické cookies
+          {copy.analytics}
         </label>
         <label className="check">
           <input type="checkbox" name="marketing" />
-          Marketingové cookies
+          {copy.marketing}
         </label>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button type="submit">Uložit volbu</button>
+          <button type="submit">{copy.save}</button>
           <button
             type="submit"
             className="secondary"
@@ -44,7 +42,7 @@ export function CookieBanner() {
               setOpen(false);
             }}
           >
-            Jen nezbytné
+            {copy.necessary}
           </button>
         </div>
       </form>

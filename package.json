@@ -2,7 +2,7 @@
   "name": "slinc-records-v2",
   "version": "0.1.0",
   "private": true,
-  "description": "E-shop kazet Slinč Records",
+  "description": "E-shop kazet Šlinc Records",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

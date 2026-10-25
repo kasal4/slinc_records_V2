@@ -1,19 +1,24 @@
-export const metadata = { title: "Odstoupení potvrzeno" };
+import { interpolate, t } from "@/lib/i18n";
+import type { Metadata } from "next";
+
+export function generateMetadata(): Metadata {
+  return { title: t().withdrawalDone.title };
+}
 
 export default function WithdrawalDonePage({
   searchParams,
 }: {
   searchParams: { objednavka?: string };
 }) {
+  const copy = t();
   return (
     <section className="hero">
       <div className="flash">
-        Odstoupení od smlouvy {searchParams.objednavka} jsme přijali.
+        {interpolate(copy.withdrawalDone.accepted, {
+          number: searchParams.objednavka ?? "",
+        })}
       </div>
-      <p>
-        Zboží zašlete na adresu prodávajícího. Peníze vracíme po převzetí kazet,
-        nejpozději ve lhůtě podle občanského zákoníku.
-      </p>
+      <p>{copy.withdrawalDone.next}</p>
     </section>
   );
 }

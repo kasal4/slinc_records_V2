@@ -1,4 +1,4 @@
-# Slinč Records V2
+# Šlinc Records V2
 
 E-shop kazet: katalog, košík, účet, PostgreSQL a základní GDPR / distanční prodej.
 

@@ -1,0 +1,1 @@
+ALTER TABLE "Product" ADD COLUMN "format" TEXT NOT NULL DEFAULT 'mc';

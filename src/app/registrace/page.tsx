@@ -1,32 +1,35 @@
 import { registerUser } from "@/app/actions";
+import { t } from "@/lib/i18n";
+import type { Metadata } from "next";
 
-export const metadata = { title: "Registrace" };
+export function generateMetadata(): Metadata {
+  return { title: t().register.title };
+}
 
 export default function RegisterPage() {
+  const copy = t();
   return (
     <section className="hero">
-      <h1>Registrace</h1>
-      <p className="muted">
-        Heslo alespoň 10 znaků. Marketingový souhlas je oddělený od založení účtu.
-      </p>
+      <h1>{copy.register.title}</h1>
+      <p className="muted">{copy.register.hint}</p>
       <form action={registerUser} className="panel">
         <label>
-          Jméno
+          {copy.register.name}
           <input name="name" required minLength={2} />
         </label>
         <label>
-          E-mail
+          {copy.register.email}
           <input name="email" type="email" required />
         </label>
         <label>
-          Heslo
+          {copy.register.password}
           <input name="password" type="password" required minLength={10} />
         </label>
         <label className="check">
           <input type="checkbox" name="marketing" />
-          Chci novinky o kazetách e-mailem
+          {copy.register.marketing}
         </label>
-        <button type="submit">Založit účet</button>
+        <button type="submit">{copy.register.submit}</button>
       </form>
     </section>
   );
